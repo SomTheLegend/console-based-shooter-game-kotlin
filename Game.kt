@@ -49,12 +49,12 @@ class Game {
         while (!isGameOver) {
             map.display(allCombatants)
 
-            allCombatants.toList().forEach { c ->
+            for (c in allCombatants.toList()) {
                 if (c.isAlive) {
                     c.performAction(this)
                     checkForPowerUps(c)
                     checkWinCondition()
-                    if (isGameOver) return@forEach
+                    if (isGameOver) break
                 }
             }
         }
@@ -95,5 +95,9 @@ class Game {
     private fun endGame() {
 
         println("\n--- GAME OVER ---")
+    }
+
+    fun isTileOccupiedByCombatant(x: Int, y: Int): Boolean {
+        return allCombatants.any { it.isAlive && it.position.x == x && it.position.y == y }
     }
 }

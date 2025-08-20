@@ -17,8 +17,9 @@ abstract class Combatant (
         position.setLocation(x, y)
     }
 
-    fun moveTowards(target: Point, map: GameMap) {
+    fun moveTowards(target: Point, game: Game) {
 
+        val map = game.map
         val currentX = position.x
         val currentY = position.y
 
@@ -28,10 +29,10 @@ abstract class Combatant (
         val newX = currentX + dx
         val newY = currentY + dy
 
-        if (dx != 0 && !map.isOccupiedByObstacle(newX, currentY)) {
+        if (dx != 0 && !map.isOccupiedByObstacle(newX, currentY) && !game.isTileOccupiedByCombatant(newX, currentY)) {
             setPosition(newX, currentY)
        }
-        else if (dy != 0 && !map.isOccupiedByObstacle(currentX, newY)) {
+        else if (dy != 0 && !map.isOccupiedByObstacle(currentX, newY) && !game.isTileOccupiedByCombatant(currentX, newY)) {
             setPosition(currentX, newY)
        }
 

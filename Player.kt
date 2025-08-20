@@ -25,15 +25,16 @@ class Player(
         println("4. Reload")
 
         when (getPlayerInput(1, 4)) {
-            1 -> handleMove(game.map)
+            1 -> handleMove(game)
             2 -> handleAttack(game)
             3 -> takeCover()
             4 -> currentWeapon.reload()
         }
     }
 
-    private fun handleMove(map: GameMap) {
+    private fun handleMove(game: Game) {
 
+        val map = game.map
         println("Enter target X coordinate: ")
         val targetX = getPlayerInput(0, map.width - 1)
 
@@ -42,6 +43,8 @@ class Player(
 
         if (map.isOccupiedByObstacle(targetX, targetY)) {
             println("Cannot move to that location! There is an obstacle.")
+        } else if (game.isTileOccupiedByCombatant(targetX, targetY)) {
+            println("Cannot move to that location! It is occupied.")
         }
         else {
             setPosition(targetX, targetY)
@@ -53,7 +56,7 @@ class Player(
 
         val validTargets = game.allCombatants.filter {
             it.isAlive && it.team != this.team &&
-                    game.map.hasLineOfSight(position, it.position)
+                    game.map.hasLineOfSight(position, it.position, game.allCombatants)
         }
 
         if (validTargets.isEmpty()) {
