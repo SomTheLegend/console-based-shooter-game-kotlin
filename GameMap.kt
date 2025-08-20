@@ -28,12 +28,12 @@ class GameMap(val width: Int, val height: Int) {
         return isValid(x, y) && grid[y][x] == OBSTACLE
     }
 
-    fun hasLineOfSight(start: Point, end: Point): Boolean {
+    fun hasLineOfSight(start: Point, end: Point, combatants: List<Combatant>): Boolean {
 
         var x1 = start.x
         var y1 = start.y
-        var x2 = end.x
-        var y2 = end.y
+        val x2 = end.x
+        val y2 = end.y
 
         val dx = Math.abs(x2 - x1)
         val dy = Math.abs(y2 - y1)
@@ -46,7 +46,12 @@ class GameMap(val width: Int, val height: Int) {
                 if (isOccupiedByObstacle(x1, y1)) {
                     return false
                 }
+                // Check if the point is occupied by a combatant, but ignore the target at the end point
+                if (combatants.any { it.isAlive && it.position.x == x1 && it.position.y == y1 && (x1 != end.x || y1 != end.y) }) {
+                    return false
+                }
             }
+
             if (x1 == x2 && y1 == y2) {
                 break
             }

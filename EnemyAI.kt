@@ -18,22 +18,29 @@ class EnemyAI(
         //1. FIND AND ATTACK THE BEST TARGET
         val target = findBestTarget(map, allCombatants)
         if (target != null) {
-            println("$name attacks ${target.name}!")
-            target.takeDamage(currentWeapon.damage)
-            return
+            if (currentWeapon.hasAmmo()) {
+                println("$name attacks ${target.name}!")
+                currentWeapon.useAmmo()
+                target.takeDamage(currentWeapon.damage)
+                return
+            } else {
+                println("$name needs to reload!")
+                currentWeapon.reload()
+                return
+            }
         }
 
         //2.IF NO TARGET, PATROL
         val closestEnemy = findClosestEnemy(allCombatants)
         if (closestEnemy != null) {
-            moveTowards(closestEnemy.position, map)
+            moveTowards(closestEnemy.position, game)
         } else if (patrolPoints.isNotEmpty()) {
             //PATROL LOGIC
             var patrolTarget = patrolPoints[currentPatrolIndex]
             if (position == patrolTarget) {
                 currentPatrolIndex = (currentPatrolIndex + 1) % patrolPoints.size
             }
-            moveTowards(patrolTarget, map)
+            moveTowards(patrolTarget, game)
         }
     }
 
@@ -42,13 +49,13 @@ class EnemyAI(
 
         return allCombatants.find {
             it.isAlive && it.team != this.team &&
-                    map.hasLineOfSight(this.position, it.position)
+                    map.hasLineOfSight(this.position, it.position, allCombatants)
         }
     }
 
     private fun findClosestEnemy(allCombatants: List<Combatant>): Combatant? {
 
         return allCombatants.filter { it.isAlive && it.team != this.team }
-            .minByOrNull { this.position.distance(it.position) }
+            .minWith(compareBy { this.position.distance(it.position) })
     }
 }
